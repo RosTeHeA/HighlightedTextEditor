@@ -1,8 +1,9 @@
 //
-//  Markdown.swift
+//  Pretty-Markdown.swift
 //
 //
-//  Created by Kyle Nazario on 5/26/21.
+//  Original markdown.swift by Kyle Nazario on 5/26/21.
+//  Pretty-Markdown.swift created by RosTeHea on 5/13/23.
 //
 
 import SwiftUI
@@ -33,22 +34,33 @@ private let htmlRegex = try! NSRegularExpression(
     options: [.dotMatchesLineSeparators, .caseInsensitive]
 )
 
+// Code to help style the syntax, as well as highlighting
+private let asteriskSyntaxRegex = try! NSRegularExpression(pattern: "\\*", options: [])
+private let headingSyntaxRegex = try! NSRegularExpression(pattern: "^#{1,6}", options: [.anchorsMatchLines])
+private let italicOpenSyntaxRegex = try! NSRegularExpression(pattern: "(?<=^|[^*])\\*(?=[^*])", options: [])
+private let italicCloseSyntaxRegex = try! NSRegularExpression(pattern: "(?<=[^*])\\*(?=[^*]|$)", options: [])
+private let highlightedTextRegex = try! NSRegularExpression(pattern: "==[^=]+==", options: [])
+private let highlightedSyntaxRegex = try! NSRegularExpression(pattern: "(?<=\\s)==|==(?=\\s)", options: [])
+
+
 #if os(macOS)
-let codeFont = NSFont.monospacedSystemFont(ofSize: NSFont.systemFontSize, weight: .thin)
+let codeFont = NSFont(name: "Avenir Next", size: NSFont.systemFontSize) ?? NSFont.systemFont(ofSize: NSFont.systemFontSize)
 let headingTraits: NSFontDescriptor.SymbolicTraits = [.bold, .expanded]
 let boldTraits: NSFontDescriptor.SymbolicTraits = [.bold]
 let emphasisTraits: NSFontDescriptor.SymbolicTraits = [.italic]
 let boldEmphasisTraits: NSFontDescriptor.SymbolicTraits = [.bold, .italic]
 let secondaryBackground = NSColor.windowBackgroundColor
+let textHighlight = NSColor(calibratedRed: 179/255, green: 239/255, blue: 255/255, alpha: 1)
 let lighterColor = NSColor.lightGray
 let textColor = NSColor.labelColor
 #else
-let codeFont = UIFont.monospacedSystemFont(ofSize: UIFont.systemFontSize, weight: .thin)
+let codeFont = UIFont(name: "Avenir Next", size: UIFont.systemFontSize) ?? UIFont.systemFont(ofSize: UIFont.systemFontSize)
 let headingTraits: UIFontDescriptor.SymbolicTraits = [.traitBold, .traitExpanded]
 let boldTraits: UIFontDescriptor.SymbolicTraits = [.traitBold]
 let emphasisTraits: UIFontDescriptor.SymbolicTraits = [.traitItalic]
 let boldEmphasisTraits: UIFontDescriptor.SymbolicTraits = [.traitBold, .traitItalic]
 let secondaryBackground = UIColor.secondarySystemBackground
+let textHighlight = UIColor(red: 179/255, green: 239/255, blue: 255/255, alpha: 1)
 let lighterColor = UIColor.lightGray
 let textColor = UIColor.label
 #endif
@@ -56,7 +68,7 @@ let textColor = UIColor.label
 private let maxHeadingLevel = 6
 
 public extension Sequence where Iterator.Element == HighlightRule {
-    static var markdown: [HighlightRule] {
+    static var prettyMarkdown: [HighlightRule] {
         [
             HighlightRule(pattern: inlineCodeRegex, formattingRule: TextFormattingRule(key: .font, value: codeFont)),
             HighlightRule(pattern: codeBlockRegex, formattingRule: TextFormattingRule(key: .font, value: codeFont)),
@@ -126,7 +138,19 @@ public extension Sequence where Iterator.Element == HighlightRule {
             HighlightRule(pattern: htmlRegex, formattingRules: [
                 TextFormattingRule(key: .font, value: codeFont),
                 TextFormattingRule(key: .foregroundColor, value: lighterColor)
-            ])
+            ]),
+            HighlightRule(pattern: asteriskSyntaxRegex, formattingRule: TextFormattingRule(key: .foregroundColor, value: lighterColor)),
+            HighlightRule(pattern: headingSyntaxRegex, formattingRules: [
+                TextFormattingRule(key: .foregroundColor, value: lighterColor),
+                TextFormattingRule(key: .font, value: SystemFontAlias.systemFont(ofSize: 14))
+            ]),
+            HighlightRule(pattern: italicOpenSyntaxRegex, formattingRule: TextFormattingRule(key: .foregroundColor, value: lighterColor)),
+            HighlightRule(pattern: italicCloseSyntaxRegex, formattingRule: TextFormattingRule(key: .foregroundColor, value: lighterColor)),
+            HighlightRule(pattern: highlightedTextRegex, formattingRules: [
+                TextFormattingRule(key: .backgroundColor, value: textHighlight),
+                TextFormattingRule(key: .foregroundColor, value: textColor)
+            ]),
+            HighlightRule(pattern: highlightedSyntaxRegex, formattingRule: TextFormattingRule(key: .foregroundColor, value: lighterColor)),
         ]
     }
 }
