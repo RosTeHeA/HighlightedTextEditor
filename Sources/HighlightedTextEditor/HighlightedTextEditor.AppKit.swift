@@ -85,13 +85,38 @@ public extension HighlightedTextEditor {
             self.parent = parent
         }
 
+//        public func textView(
+//            _ textView: NSTextView,
+//            shouldChangeTextIn affectedCharRange: NSRange,
+//            replacementString: String?
+//        ) -> Bool {
+//            return true
+//        }
+        
+// Commented out the original (above) and replaced with following to supposedly help with indenting paragraphs
         public func textView(
             _ textView: NSTextView,
             shouldChangeTextIn affectedCharRange: NSRange,
             replacementString: String?
         ) -> Bool {
+            if let replacementString = replacementString,
+               replacementString == "\n" {
+                if let range = Range(affectedCharRange, in: textView.string) {
+                    let paragraphRange = textView.string.paragraphRange(for: range)
+                    let currentParagraph = textView.string[paragraphRange]
+                    let numberOfLeadingSpaces = currentParagraph.prefix { $0 == " " }.count
+
+                    if numberOfLeadingSpaces > 0 {
+                        let indentation = String(repeating: " ", count: numberOfLeadingSpaces)
+                        textView.insertText("\n" + indentation, replacementRange: affectedCharRange)
+                        return false
+                    }
+                }
+            }
             return true
         }
+
+
 
         public func textDidBeginEditing(_ notification: Notification) {
             guard let textView = notification.object as? NSTextView else {
