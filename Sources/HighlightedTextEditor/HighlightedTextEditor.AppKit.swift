@@ -49,6 +49,13 @@ public struct HighlightedTextEditor: NSViewRepresentable, HighlightingTextEditor
         let textView = ScrollableTextView()
         textView.delegate = context.coordinator
 
+        // Set the background color based on device light or dark mode
+        if NSAppearance.current.bestMatch(from: [.darkAqua, .aqua]) == .darkAqua {
+                textView.textView.backgroundColor = NSColor(red: 48/255, green: 39/255, blue: 53/255, alpha: 1)
+            } else {
+                textView.textView.backgroundColor = NSColor(red: 255/255, green: 255/255, blue: 255/255, alpha: 1)
+            }
+
         return textView
     }
 
@@ -67,6 +74,20 @@ public struct HighlightedTextEditor: NSViewRepresentable, HighlightingTextEditor
         view.textView.typingAttributes = typingAttributes
         context.coordinator.updatingNSView = false
 
+        // Update the background color based on device light or dark mode
+            if NSAppearance.current.bestMatch(from: [.darkAqua, .aqua]) == .darkAqua {
+                view.textView.backgroundColor = NSColor(red: 48/255, green: 39/255, blue: 53/255, alpha: 1)
+            } else {
+                view.textView.backgroundColor = NSColor(red: 255/255, green: 255/255, blue: 255/255, alpha: 1)
+            }
+        
+        // Update the text color to be bright white if in dark mode (hard-coded from original grey) - just comment out to revert to original
+        if NSAppearance.current.bestMatch(from: [.darkAqua, .aqua]) == .darkAqua {
+            view.textView.textColor = NSColor.white
+        } else {
+            view.textView.textColor = NSColor.labelColor
+        }
+        
         // Make the NSTextView the first responder
         DispatchQueue.main.async {
             view.textView.window?.makeFirstResponder(view.textView)
@@ -220,7 +241,13 @@ public extension HighlightedTextEditor {
             textView.isVerticallyResizable = true
             textView.maxSize = NSSize(width: CGFloat.greatestFiniteMagnitude, height: CGFloat.greatestFiniteMagnitude)
             textView.minSize = NSSize(width: 0, height: contentSize.height)
-            textView.textColor = NSColor.labelColor
+            
+            // Set the text color based on device light or dark mode. Revert this to one line of textView.textColor - NSColor.labelColor for default
+             if NSAppearance.current.bestMatch(from: [.darkAqua, .aqua]) == .darkAqua {
+                 textView.textColor = NSColor.white
+             } else {
+                 textView.textColor = NSColor.labelColor
+             }
 
             return textView
         }()
