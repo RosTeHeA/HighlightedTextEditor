@@ -43,16 +43,31 @@ private let highlightedTextRegex = try! NSRegularExpression(pattern: "==[^=]+=="
 private let highlightedSyntaxRegex = try! NSRegularExpression(pattern: "(?<=\\s)==|==(?=\\s)", options: [])
 
 
+
+//To help with dark and light modes
+extension NSColor {
+    static func backgroundColor() -> NSColor {
+        let isDarkMode = NSAppearance.currentDrawing().bestMatch(from: [.darkAqua, .aqua]) == .darkAqua
+        return isDarkMode ? NSColor.darkGray : NSColor.cyan
+    }
+    
+    static func foregroundColor() -> NSColor {
+        let isDarkMode = NSAppearance.currentDrawing().bestMatch(from: [.darkAqua, .aqua]) == .darkAqua
+        return isDarkMode ? NSColor.black : NSColor.labelColor
+    }
+}
+
+
 #if os(macOS)
 let codeFont = NSFont(name: "Avenir Next", size: NSFont.systemFontSize) ?? NSFont.systemFont(ofSize: NSFont.systemFontSize)
 let headingTraits: NSFontDescriptor.SymbolicTraits = [.bold, .expanded]
 let boldTraits: NSFontDescriptor.SymbolicTraits = [.bold]
 let emphasisTraits: NSFontDescriptor.SymbolicTraits = [.italic]
 let boldEmphasisTraits: NSFontDescriptor.SymbolicTraits = [.bold, .italic]
-let secondaryBackground = NSColor.windowBackgroundColor
+let secondaryBackground = NSColor.backgroundColor()
 let textHighlight = NSColor(calibratedRed: 179/255, green: 239/255, blue: 255/255, alpha: 1)
 let lighterColor = NSColor.lightGray
-let textColor = NSColor.labelColor
+let textColor = NSColor.foregroundColor()
 #else
 let codeFont = UIFont(name: "Avenir Next", size: UIFont.systemFontSize) ?? UIFont.systemFont(ofSize: UIFont.systemFontSize)
 let headingTraits: UIFontDescriptor.SymbolicTraits = [.traitBold, .traitExpanded]
@@ -64,6 +79,7 @@ let textHighlight = UIColor(red: 179/255, green: 239/255, blue: 255/255, alpha: 
 let lighterColor = UIColor.lightGray
 let textColor = UIColor.label
 #endif
+
 
 private let maxHeadingLevel = 6
 
