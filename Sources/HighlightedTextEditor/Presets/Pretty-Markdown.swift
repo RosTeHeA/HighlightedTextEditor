@@ -68,6 +68,7 @@ let secondaryBackground = NSColor.backgroundColor()
 let textHighlight = NSColor(calibratedRed: 179/255, green: 239/255, blue: 255/255, alpha: 1)
 let lighterColor = NSColor.lightGray
 let textColor = NSColor.foregroundColor()
+
 #else
 let codeFont = UIFont(name: "Avenir Next", size: UIFont.systemFontSize) ?? UIFont.systemFont(ofSize: UIFont.systemFontSize)
 let headingTraits: UIFontDescriptor.SymbolicTraits = [.traitBold, .traitExpanded]
@@ -82,6 +83,7 @@ let textColor = UIColor.label
 
 
 private let maxHeadingLevel = 6
+
 
 public extension Sequence where Iterator.Element == HighlightRule {
     static var prettyMarkdown: [HighlightRule] {
