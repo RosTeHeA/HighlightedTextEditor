@@ -44,7 +44,7 @@ private let highlightedSyntaxRegex = try! NSRegularExpression(pattern: "(?<=\\s)
 
 
 #if os(macOS)
-let codeFont = NSFont(name: "Avenir Next", size: NSFont.systemFontSize) ?? NSFont.systemFont(ofSize: NSFont.systemFontSize)
+let codeFont = NSFont(name: "Lato", size: 16.0) ?? NSFont.systemFont(ofSize: 16.0)
 let headingTraits: NSFontDescriptor.SymbolicTraits = [.bold, .expanded]
 let boldTraits: NSFontDescriptor.SymbolicTraits = [.bold]
 let emphasisTraits: NSFontDescriptor.SymbolicTraits = [.italic]
@@ -54,7 +54,7 @@ let textHighlight = NSColor(calibratedRed: 179/255, green: 239/255, blue: 255/25
 let lighterColor = NSColor.lightGray
 let textColor = NSColor.labelColor
 #else
-let codeFont = UIFont(name: "Avenir Next", size: UIFont.systemFontSize) ?? UIFont.systemFont(ofSize: UIFont.systemFontSize)
+let codeFont = UIFont(name: "Lato", size: 16.0) ?? UIFont.systemFont(ofSize: 16.0)
 let headingTraits: UIFontDescriptor.SymbolicTraits = [.traitBold, .traitExpanded]
 let boldTraits: UIFontDescriptor.SymbolicTraits = [.traitBold]
 let emphasisTraits: UIFontDescriptor.SymbolicTraits = [.traitItalic]
