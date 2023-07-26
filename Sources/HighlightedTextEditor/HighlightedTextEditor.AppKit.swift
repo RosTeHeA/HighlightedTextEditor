@@ -66,6 +66,11 @@ public struct HighlightedTextEditor: NSViewRepresentable, HighlightingTextEditor
         view.selectedRanges = context.coordinator.selectedRanges
         view.textView.typingAttributes = typingAttributes
         context.coordinator.updatingNSView = false
+
+        // Make the NSTextView the first responder
+        DispatchQueue.main.async {
+            view.textView.window?.makeFirstResponder(view.textView)
+        }
     }
 
     private func runIntrospect(_ view: ScrollableTextView) {
