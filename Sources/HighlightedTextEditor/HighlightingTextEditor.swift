@@ -16,7 +16,7 @@ public typealias SymbolicTraits = NSFontDescriptor.SymbolicTraits
 public typealias SystemTextView = NSTextView
 public typealias SystemScrollView = NSScrollView
 
-let defaultEditorFont = NSFont(name: "Lato-Regular", size: NSFont.systemFontSize + 3) ?? NSFont.systemFont(ofSize: NSFont.systemFontSize + 3)
+let defaultEditorFont = NSFont(name: "Lato-Regular", size: NSFont.systemFontSize + 2) ?? NSFont.systemFont(ofSize: NSFont.systemFontSize + 2)
 let defaultEditorTextColor = NSColor.labelColor
 
 #else
@@ -102,14 +102,18 @@ extension HighlightingTextEditor {
     var placeholderFont: SystemColorAlias { SystemColorAlias() }
 
     static func getHighlightedText(text: String, highlightRules: [HighlightRule]) -> NSMutableAttributedString {
+        let defaultParagraphSpacing: CGFloat = 4.0 // <-- Sets paragraph spacing
         let highlightedString = NSMutableAttributedString(string: text)
         let all = NSRange(location: 0, length: text.utf16.count)
 
         let editorFont = defaultEditorFont
         let editorTextColor = defaultEditorTextColor
+        let paragraphStyle = NSMutableParagraphStyle()
+        paragraphStyle.lineSpacing = defaultParagraphSpacing
 
         highlightedString.addAttribute(.font, value: editorFont, range: all)
         highlightedString.addAttribute(.foregroundColor, value: editorTextColor, range: all)
+        highlightedString.addAttribute(.paragraphStyle, value: paragraphStyle, range: all)
 
         highlightRules.forEach { rule in
             let matches = rule.pattern.matches(in: text, options: [], range: all)
