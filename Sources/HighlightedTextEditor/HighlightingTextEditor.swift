@@ -16,7 +16,7 @@ public typealias SymbolicTraits = NSFontDescriptor.SymbolicTraits
 public typealias SystemTextView = NSTextView
 public typealias SystemScrollView = NSScrollView
 
-let defaultEditorFont = NSFont(name: "Lato-Regular", size: NSFont.systemFontSize + 5) ?? NSFont.systemFont(ofSize: NSFont.systemFontSize + 5)
+let defaultEditorFont = NSFont(name: "Lato-Regular", size: NSFont.systemFontSize + 3) ?? NSFont.systemFont(ofSize: NSFont.systemFontSize + 3)
 let defaultEditorTextColor = NSColor.labelColor
 
 #else
