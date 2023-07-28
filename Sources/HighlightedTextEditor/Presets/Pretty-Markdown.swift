@@ -25,7 +25,7 @@ private let horizontalRuleRegex = try! NSRegularExpression(pattern: "\n\n(-{3}|\
 private let unorderedListRegex = try! NSRegularExpression(pattern: "^(\\-|\\*)\\s", options: [.anchorsMatchLines])
 private let orderedListRegex = try! NSRegularExpression(pattern: "^\\d*\\.\\s", options: [.anchorsMatchLines])
 private let buttonRegex = try! NSRegularExpression(pattern: "<\\s*button[^>]*>(.*?)<\\s*/\\s*button>", options: [])
-private let strikethroughRegex = try! NSRegularExpression(pattern: "(~)((?!\\1).)+\\1", options: [])
+private let strikethroughRegex = try! NSRegularExpression(pattern: "(~~)((?!\\1).)+\\1", options: [])
 private let tagRegex = try! NSRegularExpression(pattern: "^\\[([^\\[\\]]*)\\]:", options: [.anchorsMatchLines])
 private let footnoteRegex = try! NSRegularExpression(pattern: "\\[\\^(.*?)\\]", options: [])
 // courtesy https://www.regular-expressions.info/examples.html
