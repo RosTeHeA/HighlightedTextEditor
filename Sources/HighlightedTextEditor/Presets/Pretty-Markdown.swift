@@ -44,18 +44,35 @@ private let highlightedSyntaxRegex = try! NSRegularExpression(pattern: "(?<=\\s)
 
 
 
-//To help with dark and light modes
+#if os(macOS)
+// For macOS
 extension NSColor {
     static func backgroundColor() -> NSColor {
-        let isDarkMode = NSAppearance.currentDrawing().bestMatch(from: [.darkAqua, .aqua]) == .darkAqua
+        let isDarkMode = NSAppearance.current.bestMatch(from: [.darkAqua, .aqua]) == .darkAqua
         return isDarkMode ? NSColor.darkGray : NSColor.cyan
     }
     
     static func foregroundColor() -> NSColor {
-        let isDarkMode = NSAppearance.currentDrawing().bestMatch(from: [.darkAqua, .aqua]) == .darkAqua
+        let isDarkMode = NSAppearance.current.bestMatch(from: [.darkAqua, .aqua]) == .darkAqua
         return isDarkMode ? NSColor.black : NSColor.labelColor
     }
 }
+#elseif os(iOS) || os(tvOS) || os(watchOS)
+// For iOS, iPadOS, tvOS, and watchOS
+import UIKit
+
+extension UIColor {
+    static func backgroundColor() -> UIColor {
+        let userInterfaceStyle = UIScreen.main.traitCollection.userInterfaceStyle
+        return userInterfaceStyle == .dark ? UIColor.darkGray : UIColor.cyan
+    }
+    
+    static func foregroundColor() -> UIColor {
+        let userInterfaceStyle = UIScreen.main.traitCollection.userInterfaceStyle
+        return userInterfaceStyle == .dark ? UIColor.black : UIColor.label
+    }
+}
+#endif
 
 
 #if os(macOS)
@@ -65,7 +82,10 @@ let boldTraits: NSFontDescriptor.SymbolicTraits = [.bold]
 let emphasisTraits: NSFontDescriptor.SymbolicTraits = [.italic]
 let boldEmphasisTraits: NSFontDescriptor.SymbolicTraits = [.bold, .italic]
 let secondaryBackground = NSColor.backgroundColor()
-let textHighlight = NSColor(calibratedRed: 179/255, green: 239/255, blue: 255/255, alpha: 1)
+let textHighlight = NSColor(calibratedRed: 22/255, green: 214/255, blue: 248/255, alpha: 0.3)
+
+// Original highlight color
+//let textHighlight = NSColor(calibratedRed: 179/255, green: 239/255, blue: 255/255, alpha: 1)
 let lighterColor = NSColor.lightGray
 let textColor = NSColor.foregroundColor()
 

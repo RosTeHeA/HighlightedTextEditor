@@ -49,12 +49,12 @@ public struct HighlightedTextEditor: NSViewRepresentable, HighlightingTextEditor
         let textView = ScrollableTextView()
         textView.delegate = context.coordinator
 
-        // Set the background color based on device light or dark mode
-        if NSAppearance.current.bestMatch(from: [.darkAqua, .aqua]) == .darkAqua {
-                textView.textView.backgroundColor = NSColor(red: 48/255, green: 39/255, blue: 53/255, alpha: 1)
-            } else {
-                textView.textView.backgroundColor = NSColor(red: 255/255, green: 255/255, blue: 255/255, alpha: 1)
-            }
+        // Set the background color based on device light or dark mode - COMMENTED OUT - SHOULD USE .INTROSPECT IN MAIN APP
+//        if NSAppearance.current.bestMatch(from: [.darkAqua, .aqua]) == .darkAqua {
+//                textView.textView.backgroundColor = NSColor(red: 48/255, green: 39/255, blue: 53/255, alpha: 1)
+//            } else {
+//                textView.textView.backgroundColor = NSColor(red: 255/255, green: 255/255, blue: 255/255, alpha: 1)
+//            }
 
         return textView
     }
@@ -75,19 +75,19 @@ public struct HighlightedTextEditor: NSViewRepresentable, HighlightingTextEditor
         context.coordinator.updatingNSView = false
 
         // Update the background color based on device light or dark mode
-            if NSAppearance.current.bestMatch(from: [.darkAqua, .aqua]) == .darkAqua {
-                view.textView.backgroundColor = NSColor(red: 48/255, green: 39/255, blue: 53/255, alpha: 1)
-            } else {
-                view.textView.backgroundColor = NSColor(red: 255/255, green: 255/255, blue: 255/255, alpha: 1)
-            }
+//            if NSAppearance.current.bestMatch(from: [.darkAqua, .aqua]) == .darkAqua {
+//                view.textView.backgroundColor = NSColor(red: 48/255, green: 39/255, blue: 53/255, alpha: 1)
+//            } else {
+//                view.textView.backgroundColor = NSColor(red: 255/255, green: 255/255, blue: 255/255, alpha: 1)
+//            }
         
         // Update the text color to be bright white if in dark mode (hard-coded from original grey) - just comment out to revert to original
-        if NSAppearance.current.bestMatch(from: [.darkAqua, .aqua]) == .darkAqua {
-            view.textView.textColor = NSColor.white
-        } else {
-            view.textView.textColor = NSColor.labelColor
-        }
-        
+//        if NSAppearance.current.bestMatch(from: [.darkAqua, .aqua]) == .darkAqua {
+//            view.textView.textColor = NSColor.white
+//        } else {
+//            view.textView.textColor = NSColor.labelColor
+//        }
+//        
         // Make the NSTextView the first responder
         DispatchQueue.main.async {
             view.textView.window?.makeFirstResponder(view.textView)
