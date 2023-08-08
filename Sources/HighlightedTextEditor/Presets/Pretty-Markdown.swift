@@ -39,7 +39,7 @@ private let asteriskSyntaxRegex = try! NSRegularExpression(pattern: "\\*", optio
 private let headingSyntaxRegex = try! NSRegularExpression(pattern: "^#{1,6}", options: [.anchorsMatchLines])
 private let italicOpenSyntaxRegex = try! NSRegularExpression(pattern: "(?<=^|[^*])\\*(?=[^*])", options: [])
 private let italicCloseSyntaxRegex = try! NSRegularExpression(pattern: "(?<=[^*])\\*(?=[^*]|$)", options: [])
-private let highlightedTextRegex = try! NSRegularExpression(pattern: "==[^=]+==", options: [])
+private let highlightedTextRegex = try! NSRegularExpression(pattern: "==.*?==", options: [])
 private let highlightedSyntaxRegex = try! NSRegularExpression(pattern: "(?<=\\s)==|==(?=\\s)", options: [])
 
 
