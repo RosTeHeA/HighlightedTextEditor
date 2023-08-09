@@ -13,6 +13,61 @@ import AppKit
 import Combine
 import SwiftUI
 
+// Adding to enable formatting keyboard shortcuts
+public class CustomNSTextView: NSTextView {
+    override public var typingAttributes: [NSAttributedString.Key : Any] {
+        didSet {
+            let defaultEditorFont = NSFont(name: "Lato-Regular", size: NSFont.systemFontSize + 2) ?? NSFont.systemFont(ofSize: NSFont.systemFontSize + 2)
+            super.typingAttributes = [NSAttributedString.Key.font: defaultEditorFont]
+        }
+    }
+    override public func keyDown(with event: NSEvent) {
+        guard let selectedRange = selectedRanges.first as? NSRange, selectedRange.length > 0 else {
+            super.keyDown(with: event)
+            return
+        }
+
+        let selectedText = (string as NSString).substring(with: selectedRange)
+        var newText: String? = nil
+        
+        if event.modifierFlags.contains(.command) {
+            switch event.characters {
+            case "b":
+                newText = toggleSurrounding(for: selectedText, with: "**")
+            case "i":
+                newText = toggleSurrounding(for: selectedText, with: "*")
+            case "h":
+                if event.modifierFlags.contains(.shift) {
+                    newText = toggleSurrounding(for: selectedText, with: "==")
+                }
+            case "s":
+                if event.modifierFlags.contains(.shift) {
+                    newText = toggleSurrounding(for: selectedText, with: "~~")
+                }
+            default:
+                break
+            }
+        }
+
+        if let newText = newText {
+            insertText(newText, replacementRange: selectedRange)
+        } else {
+            super.keyDown(with: event)
+        }
+    }
+
+    private func toggleSurrounding(for text: String, with characters: String) -> String {
+        if text.hasPrefix(characters) && text.hasSuffix(characters) {
+            return String(text.dropFirst(characters.count).dropLast(characters.count))
+        } else {
+            return characters + text + characters
+        }
+    }
+}
+
+
+
+
 public struct HighlightedTextEditor: NSViewRepresentable, HighlightingTextEditor {
     public struct Internals {
         public let textView: SystemTextView
@@ -216,7 +271,9 @@ public extension HighlightedTextEditor {
             return scrollView
         }()
 
-        public lazy var textView: NSTextView = {
+        // Commented out original reference, to point this to the new custom view to enable formatting shortcuts
+       //  public lazy var textView: NSTextView = {
+        public lazy var textView: CustomNSTextView = {
             let contentSize = scrollView.contentSize
             let textStorage = NSTextStorage()
 
@@ -232,25 +289,26 @@ public extension HighlightedTextEditor {
 
             layoutManager.addTextContainer(textContainer)
 
-            let textView = NSTextView(frame: .zero, textContainer: textContainer)
-            textView.autoresizingMask = .width
-            textView.backgroundColor = NSColor.textBackgroundColor
-            textView.delegate = self.delegate
-            textView.drawsBackground = true
-            textView.isHorizontallyResizable = false
-            textView.isVerticallyResizable = true
-            textView.maxSize = NSSize(width: CGFloat.greatestFiniteMagnitude, height: CGFloat.greatestFiniteMagnitude)
-            textView.minSize = NSSize(width: 0, height: contentSize.height)
+            let customTextView = CustomNSTextView(frame: .zero, textContainer: textContainer)
+            customTextView.autoresizingMask = .width
+            customTextView.backgroundColor = NSColor.textBackgroundColor
+            customTextView.delegate = self.delegate
+            customTextView.drawsBackground = true
+            customTextView.isHorizontallyResizable = false
+            customTextView.isVerticallyResizable = true
+            customTextView.maxSize = NSSize(width: CGFloat.greatestFiniteMagnitude, height: CGFloat.greatestFiniteMagnitude)
+            customTextView.minSize = NSSize(width: 0, height: contentSize.height)
             
             // Set the text color based on device light or dark mode. Revert this to one line of textView.textColor - NSColor.labelColor for default
-             if NSAppearance.current.bestMatch(from: [.darkAqua, .aqua]) == .darkAqua {
-                 textView.textColor = NSColor.white
-             } else {
-                 textView.textColor = NSColor.labelColor
-             }
+            if NSAppearance.current.bestMatch(from: [.darkAqua, .aqua]) == .darkAqua {
+                customTextView.textColor = NSColor.white
+            } else {
+                customTextView.textColor = NSColor.labelColor
+            }
 
-            return textView
+            return customTextView
         }()
+
 
         // MARK: - Init
 
