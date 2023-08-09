@@ -114,41 +114,48 @@ public struct HighlightedTextEditor: NSViewRepresentable, HighlightingTextEditor
         return textView
     }
 
-    public func updateNSView(_ view: ScrollableTextView, context: Context) {
-        context.coordinator.updatingNSView = true
-        let typingAttributes = view.textView.typingAttributes
+    // Updated to help stop my "idle timer" refreshing this every 5 seconds and moving the cursor placement to the end. This was only happening in my "private" notes
+    
+    /* The issue seems to lie in how the text is replaced and how the cursor position is maintained during the update. Since the entire attributed text is being replaced, it might reset the cursor to the end of the content.
+     
+     The following modification might help to preserve the cursor position:
 
-        let highlightedText = HighlightedTextEditor.getHighlightedText(
-            text: text,
-            highlightRules: highlightRules
-        )
+     Preserve the cursor position and selection before updating the attributed text.
+     Set the attributed text.
+     Restore the cursor position and selection.
+     The code to achieve this could look something like the following modification to the updateNSView method:*/
+              
+                public func updateNSView(_ view: ScrollableTextView, context: Context) {
+                context.coordinator.updatingNSView = true
+                let typingAttributes = view.textView.typingAttributes
+                
+                // Preserve the current selected range
+                let currentSelectedRanges = view.textView.selectedRanges
 
-        view.attributedText = highlightedText
-        runIntrospect(view)
-        view.selectedRanges = context.coordinator.selectedRanges
-        view.textView.typingAttributes = typingAttributes
-        context.coordinator.updatingNSView = false
+                let highlightedText = HighlightedTextEditor.getHighlightedText(
+                    text: text,
+                    highlightRules: highlightRules
+                )
+                
+                view.attributedText = highlightedText
+                runIntrospect(view)
+                
+                // Restore the selected range
+                view.textView.selectedRanges = currentSelectedRanges
+                view.textView.typingAttributes = typingAttributes
+                
+                context.coordinator.updatingNSView = false
+                }
+    
+    
+/* This code snippet saves the current selection before updating the attributed text and restores it afterward. It might prevent the cursor from jumping to the end of the text.
+ 
+ It's worth noting that working with text views and maintaining the cursor position can be delicate, depending on the specific behavior of the underlying text view and the text processing being performed. The above modification is a logical approach based on the code provided, but it might require further refinement and testing to ensure that it works correctly in all scenarios.
 
-        // Update the background color based on device light or dark mode
-//            if NSAppearance.current.bestMatch(from: [.darkAqua, .aqua]) == .darkAqua {
-//                view.textView.backgroundColor = NSColor(red: 48/255, green: 39/255, blue: 53/255, alpha: 1)
-//            } else {
-//                view.textView.backgroundColor = NSColor(red: 255/255, green: 255/255, blue: 255/255, alpha: 1)
-//            }
-        
-        // Update the text color to be bright white if in dark mode (hard-coded from original grey) - just comment out to revert to original
-//        if NSAppearance.current.bestMatch(from: [.darkAqua, .aqua]) == .darkAqua {
-//            view.textView.textColor = NSColor.white
-//        } else {
-//            view.textView.textColor = NSColor.labelColor
-//        }
-//        
-        // Make the NSTextView the first responder
-        DispatchQueue.main.async {
-            view.textView.window?.makeFirstResponder(view.textView)
-        }
-    }
+ I recommend testing this change in your application and observing how it affects the cursor behavior in different situations, including typing, selection, and highlighting. If further issues arise, you may need to dive deeper into the interaction between the attributed text, selection, and underlying text view behavior.*/
 
+    
+    
     private func runIntrospect(_ view: ScrollableTextView) {
         guard let introspect = introspect else { return }
         let internals = Internals(textView: view.textView, scrollView: view.scrollView)
