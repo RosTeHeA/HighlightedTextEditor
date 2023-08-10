@@ -13,6 +13,36 @@ import AppKit
 import Combine
 import SwiftUI
 
+
+// Adding to help with hiding markdown syntax
+extension NSAttributedString.Key {
+    static let hideMarkdownSyntax = NSAttributedString.Key("HideMarkdownSyntax")
+}
+
+
+// custom class to help hide markdown syntax
+public class CustomLayoutManager: NSLayoutManager {
+    override public func drawGlyphs(forGlyphRange glyphsToShow: NSRange, at origin: CGPoint) {
+        guard let textStorage = textStorage else { return }
+
+        var rangeToDraw = glyphsToShow
+        textStorage.enumerateAttribute(NSAttributedString.Key.hideMarkdownSyntax, in: glyphsToShow, options: []) { value, range, stop in
+            if value as? Bool == true {
+                // Drawing a sub-range without the hiding syntax
+                let subrangeToDraw = NSRange(location: rangeToDraw.location, length: range.location - rangeToDraw.location)
+                super.drawGlyphs(forGlyphRange: subrangeToDraw, at: origin)
+                
+                // Skip over the hiding syntax (in this example, 2 characters)
+                let skippedRange = NSRange(location: range.location, length: 2)
+                rangeToDraw = NSRange(location: skippedRange.upperBound, length: glyphsToShow.upperBound - skippedRange.upperBound)
+            }
+        }
+        // Draw any remaining glyphs
+        super.drawGlyphs(forGlyphRange: rangeToDraw, at: origin)
+    }
+}
+
+
 // Adding to enable formatting keyboard shortcuts
 public class CustomNSTextView: NSTextView {
     override public var typingAttributes: [NSAttributedString.Key : Any] {
@@ -125,27 +155,58 @@ public struct HighlightedTextEditor: NSViewRepresentable, HighlightingTextEditor
      Restore the cursor position and selection.
      The code to achieve this could look something like the following modification to the updateNSView method:*/
               
-                public func updateNSView(_ view: ScrollableTextView, context: Context) {
-                context.coordinator.updatingNSView = true
-                let typingAttributes = view.textView.typingAttributes
-                
-                // Preserve the current selected range
-                let currentSelectedRanges = view.textView.selectedRanges
+    public func updateNSView(_ view: ScrollableTextView, context: Context) {
+        context.coordinator.updatingNSView = true
+        let typingAttributes = view.textView.typingAttributes
 
-                let highlightedText = HighlightedTextEditor.getHighlightedText(
-                    text: text,
-                    highlightRules: highlightRules
-                )
+        // Preserve the current selected range
+        let currentSelectedRanges = view.textView.selectedRanges.compactMap { $0 as? NSRange }
+
+        var highlightedText = HighlightedTextEditor.getHighlightedText(
+            text: text,
+            highlightRules: highlightRules
+        )
+        
+        
+        let markdownCharacters = "**"
+        let markdownCharactersCount = markdownCharacters.count
+
+        
+        if let selectedRange = currentSelectedRanges.first {
+            highlightedText.enumerateAttribute(.font, in: NSRange(location: 0, length: highlightedText.length), options: []) { value, range, stop in
                 
-                view.attributedText = highlightedText
-                runIntrospect(view)
-                
-                // Restore the selected range
-                view.textView.selectedRanges = currentSelectedRanges
-                view.textView.typingAttributes = typingAttributes
-                
-                context.coordinator.updatingNSView = false
+                // Check for bounds while adjusting the range
+                let startLocation = max(0, range.location - markdownCharactersCount)
+                let endLocation = min(highlightedText.length, range.location + range.length + markdownCharactersCount)
+                let adjustedRange = NSRange(location: startLocation, length: endLocation - startLocation)
+
+                if intersects(adjustedRange, selectedRange) {
+                    print("Intersects - range: \(range), selectedRange: \(selectedRange)")
+
+                    // Don't hide Markdown syntax
+                    highlightedText.removeAttribute(NSAttributedString.Key.hideMarkdownSyntax, range: adjustedRange)
+                } else {
+                    print("Does not intersect - range: \(range), selectedRange: \(selectedRange)")
+
+                    // Hide Markdown syntax
+                    highlightedText.addAttribute(NSAttributedString.Key.hideMarkdownSyntax, value: true, range: adjustedRange)
                 }
+            }
+        }
+
+
+
+
+        view.attributedText = highlightedText
+        runIntrospect(view)
+
+        // Restore the selected range
+        view.textView.selectedRanges = currentSelectedRanges.map { NSValue(range: $0) }
+        view.textView.typingAttributes = typingAttributes
+
+        context.coordinator.updatingNSView = false
+    }
+
     
     
 /* This code snippet saves the current selection before updating the attributed text and restores it afterward. It might prevent the cursor from jumping to the end of the text.
@@ -155,6 +216,10 @@ public struct HighlightedTextEditor: NSViewRepresentable, HighlightingTextEditor
  I recommend testing this change in your application and observing how it affects the cursor behavior in different situations, including typing, selection, and highlighting. If further issues arise, you may need to dive deeper into the interaction between the attributed text, selection, and underlying text view behavior.*/
 
     
+    func intersects(_ range1: NSRange, _ range2: NSRange) -> Bool {
+        return range1.intersection(range2) != nil
+    }
+
     
     private func runIntrospect(_ view: ScrollableTextView) {
         guard let introspect = introspect else { return }
@@ -322,7 +387,10 @@ public extension HighlightedTextEditor {
             let contentSize = scrollView.contentSize
             let textStorage = NSTextStorage()
 
-            let layoutManager = NSLayoutManager()
+            // Replace this line:
+            // let layoutManager = NSLayoutManager()
+            // With this line to help hide markdown syntax
+            let layoutManager = CustomLayoutManager()
             textStorage.addLayoutManager(layoutManager)
 
             let textContainer = NSTextContainer(containerSize: scrollView.frame.size)
