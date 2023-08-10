@@ -77,7 +77,7 @@ extension UIColor {
 
 #if os(macOS)
 let headingFont = NSFont(name: "Lato-Bold", size: NSFont.systemFontSize) ?? NSFont.systemFont(ofSize: NSFont.systemFontSize, weight: .heavy) // Use Lato-Bold or fall back to a heavy system font
-let codeFont = NSFont(name: "Avenir Next", size: NSFont.systemFontSize) ?? NSFont.systemFont(ofSize: NSFont.systemFontSize)
+let codeFont = NSFont(name: "Menlo", size: NSFont.systemFontSize) ?? NSFont.systemFont(ofSize: NSFont.systemFontSize)
 let headingTraits: NSFontDescriptor.SymbolicTraits = [.bold, .expanded]
 let boldTraits: NSFontDescriptor.SymbolicTraits = [.bold]
 let emphasisTraits: NSFontDescriptor.SymbolicTraits = [.italic]
@@ -92,7 +92,7 @@ let textColor = NSColor.foregroundColor()
 
 #else
 let headingFont = UIFont(name: "Lato Bold", size: UIFont.systemFontSize) ?? UIFont.systemFont(ofSize: UIFont.systemFontSize, weight: .heavy) // Use Lato-Bold or fall back to a heavy system font
-let codeFont = UIFont(name: "Avenir Next", size: UIFont.systemFontSize) ?? UIFont.systemFont(ofSize: UIFont.systemFontSize)
+let codeFont = UIFont(name: "Menlo", size: UIFont.systemFontSize) ?? UIFont.systemFont(ofSize: UIFont.systemFontSize)
 let headingTraits: UIFontDescriptor.SymbolicTraits = [.traitBold, .traitExpanded]
 let boldTraits: UIFontDescriptor.SymbolicTraits = [.traitBold]
 let emphasisTraits: UIFontDescriptor.SymbolicTraits = [.traitItalic]
@@ -168,7 +168,7 @@ public extension Sequence where Iterator.Element == HighlightRule {
                     let paragraphStyle = NSMutableParagraphStyle()
                     paragraphStyle.firstLineHeadIndent = 15.0 // Adjust the value for indentation
                     paragraphStyle.headIndent = 15.0 // Adjust the value for indentation
-                    paragraphStyle.paragraphSpacing = 13.0 // Adjust the value for line spacing
+                    paragraphStyle.paragraphSpacing = 12.0 // Adjust the value for line spacing
                     return paragraphStyle
                 }())
             ),
@@ -179,7 +179,7 @@ public extension Sequence where Iterator.Element == HighlightRule {
                         let paragraphStyle = NSMutableParagraphStyle()
                         paragraphStyle.firstLineHeadIndent = 15.0 // Adjust the value for indentation
                         paragraphStyle.headIndent = 15.0 // Adjust the value for indentation
-                        paragraphStyle.paragraphSpacing = 13.0 // Adjust the value for line spacing
+                        paragraphStyle.paragraphSpacing = 12.0 // Adjust the value for line spacing
                         return paragraphStyle
                     }()),
                     TextFormattingRule(key: .foregroundColor, value: lighterColor) // Coloring the numbers
