@@ -181,28 +181,66 @@ public extension HighlightedTextEditor {
 //            return true
 //        }
         
-// Commented out the original (above) and replaced with following to supposedly help with indenting paragraphs
+// Commented out the original (above) and replaced with following to help with auto-continuing ordered and unordered lists
         public func textView(
             _ textView: NSTextView,
             shouldChangeTextIn affectedCharRange: NSRange,
             replacementString: String?
         ) -> Bool {
-            if let replacementString = replacementString,
-               replacementString == "\n" {
-                if let range = Range(affectedCharRange, in: textView.string) {
-                    let paragraphRange = textView.string.paragraphRange(for: range)
-                    let currentParagraph = textView.string[paragraphRange]
-                    let numberOfLeadingSpaces = currentParagraph.prefix { $0 == " " }.count
+            if let replacementString = replacementString, replacementString == "\n" {
+                let currentLine = textView.string as NSString
+                let currentLineRange = currentLine.lineRange(for: affectedCharRange)
+                let currentLineContent = currentLine.substring(with: currentLineRange)
 
-                    if numberOfLeadingSpaces > 0 {
-                        let indentation = String(repeating: " ", count: numberOfLeadingSpaces)
-                        textView.insertText("\n" + indentation, replacementRange: affectedCharRange)
-                        return false
+                // Unordered list logic
+                let indentationPrefixes = ["- ", "* "]
+                for prefix in indentationPrefixes {
+                    if currentLineContent.hasPrefix(prefix) {
+                        // Check if the current line consists only of the prefix and possible whitespace
+                        let contentWithoutPrefix = currentLineContent.dropFirst(prefix.count)
+                        if contentWithoutPrefix.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                            // If so, replace the entire line with a newline
+                            textView.replaceCharacters(in: currentLineRange, with: "\n")
+                        } else {
+                            // Otherwise, add the prefix to the next line
+                            textView.insertText("\n" + prefix, replacementRange: affectedCharRange)
+                        }
+                        return false // Returning false to indicate that we've handled the change
                     }
                 }
+
+                // Ordered list logic
+                if let orderedListNumber = currentLineContent.split(separator: " ").first,
+                   let number = Int(orderedListNumber.dropLast()),
+                   currentLineContent.hasPrefix("\(number). ") {
+                    let contentWithoutPrefix = currentLineContent.dropFirst("\(number). ".count)
+                    if contentWithoutPrefix.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                        // Replace the entire line with a newline if it's only the ordered list prefix
+                        textView.replaceCharacters(in: currentLineRange, with: "\n")
+                    } else {
+                        // Add the next number to the next line
+                        let nextNumber = number + 1
+                        textView.insertText("\n\(nextNumber). ", replacementRange: affectedCharRange)
+                    }
+                    return false
+                }
             }
-            return true
+            return true // Returning true to allow normal text editing behavior
         }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

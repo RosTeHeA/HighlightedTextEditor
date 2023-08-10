@@ -118,7 +118,12 @@ public extension Sequence where Iterator.Element == HighlightRule {
                     let level = Swift.min(maxHeadingLevel, uncappedLevel)
                     let fontSize = CGFloat(maxHeadingLevel - level) * 2.5 + defaultEditorFont.pointSize
                     return SystemFontAlias(descriptor: defaultEditorFont.fontDescriptor, size: fontSize) as Any
-                })
+                }),
+                TextFormattingRule(key: .paragraphStyle, value: { // Add this rule to modify space below
+                    let paragraphStyle = NSMutableParagraphStyle()
+                    paragraphStyle.paragraphSpacing = 10.0 // Adjust the value for space below
+                    return paragraphStyle
+                }())
             ]),
             HighlightRule(
                 pattern: linkOrImageRegex,
@@ -151,11 +156,26 @@ public extension Sequence where Iterator.Element == HighlightRule {
             ),
             HighlightRule(
                 pattern: unorderedListRegex,
-                formattingRule: TextFormattingRule(key: .foregroundColor, value: lighterColor)
+                formattingRule: TextFormattingRule(key: .paragraphStyle, value: {
+                    let paragraphStyle = NSMutableParagraphStyle()
+                    paragraphStyle.firstLineHeadIndent = 15.0 // Adjust the value for indentation
+                    paragraphStyle.headIndent = 15.0 // Adjust the value for indentation
+                    paragraphStyle.paragraphSpacing = 13.0 // Adjust the value for line spacing
+                    return paragraphStyle
+                }())
             ),
             HighlightRule(
                 pattern: orderedListRegex,
-                formattingRule: TextFormattingRule(key: .foregroundColor, value: lighterColor)
+                formattingRules: [
+                    TextFormattingRule(key: .paragraphStyle, value: {
+                        let paragraphStyle = NSMutableParagraphStyle()
+                        paragraphStyle.firstLineHeadIndent = 15.0 // Adjust the value for indentation
+                        paragraphStyle.headIndent = 15.0 // Adjust the value for indentation
+                        paragraphStyle.paragraphSpacing = 13.0 // Adjust the value for line spacing
+                        return paragraphStyle
+                    }()),
+                    TextFormattingRule(key: .foregroundColor, value: lighterColor) // Coloring the numbers
+                ]
             ),
             HighlightRule(
                 pattern: buttonRegex,
