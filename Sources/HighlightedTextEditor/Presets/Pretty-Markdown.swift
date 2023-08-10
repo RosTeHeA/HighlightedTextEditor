@@ -76,6 +76,7 @@ extension UIColor {
 
 
 #if os(macOS)
+let headingFont = NSFont(name: "Lato-Bold", size: NSFont.systemFontSize) ?? NSFont.systemFont(ofSize: NSFont.systemFontSize, weight: .heavy) // Use Lato-Bold or fall back to a heavy system font
 let codeFont = NSFont(name: "Avenir Next", size: NSFont.systemFontSize) ?? NSFont.systemFont(ofSize: NSFont.systemFontSize)
 let headingTraits: NSFontDescriptor.SymbolicTraits = [.bold, .expanded]
 let boldTraits: NSFontDescriptor.SymbolicTraits = [.bold]
@@ -90,6 +91,7 @@ let lighterColor = NSColor.lightGray
 let textColor = NSColor.foregroundColor()
 
 #else
+let headingFont = UIFont(name: "Lato Bold", size: UIFont.systemFontSize) ?? UIFont.systemFont(ofSize: UIFont.systemFontSize, weight: .heavy) // Use Lato-Bold or fall back to a heavy system font
 let codeFont = UIFont(name: "Avenir Next", size: UIFont.systemFontSize) ?? UIFont.systemFont(ofSize: UIFont.systemFontSize)
 let headingTraits: UIFontDescriptor.SymbolicTraits = [.traitBold, .traitExpanded]
 let boldTraits: UIFontDescriptor.SymbolicTraits = [.traitBold]
@@ -111,13 +113,17 @@ public extension Sequence where Iterator.Element == HighlightRule {
             HighlightRule(pattern: inlineCodeRegex, formattingRule: TextFormattingRule(key: .font, value: codeFont)),
             HighlightRule(pattern: codeBlockRegex, formattingRule: TextFormattingRule(key: .font, value: codeFont)),
             HighlightRule(pattern: headingRegex, formattingRules: [
-                TextFormattingRule(fontTraits: headingTraits),
                 TextFormattingRule(key: .kern, value: 0.5),
                 TextFormattingRule(key: .font, calculateValue: { content, _ in
                     let uncappedLevel = content.prefix(while: { char in char == "#" }).count
                     let level = Swift.min(maxHeadingLevel, uncappedLevel)
-                    let fontSize = CGFloat(maxHeadingLevel - level) * 2.5 + defaultEditorFont.pointSize
-                    return SystemFontAlias(descriptor: defaultEditorFont.fontDescriptor, size: fontSize) as Any
+                    let fontSize = CGFloat(maxHeadingLevel - level) * 2.5 + headingFont.pointSize
+                    
+                    #if os(macOS)
+                    return NSFont(name: headingFont.fontName, size: fontSize) ?? headingFont
+                    #else
+                    return UIFont(name: headingFont.fontName, size: fontSize) ?? headingFont
+                    #endif
                 }),
                 TextFormattingRule(key: .paragraphStyle, value: { // Add this rule to modify space below
                     let paragraphStyle = NSMutableParagraphStyle()
@@ -125,6 +131,8 @@ public extension Sequence where Iterator.Element == HighlightRule {
                     return paragraphStyle
                 }())
             ]),
+
+
             HighlightRule(
                 pattern: linkOrImageRegex,
                 formattingRule: TextFormattingRule(key: .underlineStyle, value: NSUnderlineStyle.single.rawValue)
