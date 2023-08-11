@@ -169,7 +169,7 @@ public extension Sequence where Iterator.Element == HighlightRule {
                 formattingRule: TextFormattingRule(key: .paragraphStyle, value: {
                     let paragraphStyle = NSMutableParagraphStyle()
                     paragraphStyle.firstLineHeadIndent = 15.0 // Adjust the value for indentation
-                    paragraphStyle.headIndent = 15.0 // Adjust the value for indentation
+                    paragraphStyle.headIndent = 23.0 // Adjust the value for indentation
                     paragraphStyle.paragraphSpacing = 12.0 // Adjust the value for line spacing
                     return paragraphStyle
                 }())
@@ -180,7 +180,7 @@ public extension Sequence where Iterator.Element == HighlightRule {
                     TextFormattingRule(key: .paragraphStyle, value: {
                         let paragraphStyle = NSMutableParagraphStyle()
                         paragraphStyle.firstLineHeadIndent = 15.0 // Adjust the value for indentation
-                        paragraphStyle.headIndent = 15.0 // Adjust the value for indentation
+                        paragraphStyle.headIndent = 23.0 // Adjust the value for indentation
                         paragraphStyle.paragraphSpacing = 12.0 // Adjust the value for line spacing
                         return paragraphStyle
                     }()),
