@@ -33,6 +33,8 @@ private let htmlRegex = try! NSRegularExpression(
     pattern: "<([A-Z][A-Z0-9]*)\\b[^>]*>(.*?)</\\1>",
     options: [.dotMatchesLineSeparators, .caseInsensitive]
 )
+private let checkboxUncheckedRegex = try! NSRegularExpression(pattern: "^(\\[\\s\\]).*", options: [.anchorsMatchLines])
+
 
 // Code to help style the syntax, as well as highlighting
 private let asteriskSyntaxRegex = try! NSRegularExpression(pattern: "\\*", options: [])
@@ -217,6 +219,17 @@ public extension Sequence where Iterator.Element == HighlightRule {
                 TextFormattingRule(key: .foregroundColor, value: textColor)
             ]),
             HighlightRule(pattern: highlightedSyntaxRegex, formattingRule: TextFormattingRule(key: .foregroundColor, value: lighterColor)),
+            HighlightRule(
+                pattern: checkboxUncheckedRegex,
+                formattingRule: TextFormattingRule(key: .backgroundColor, value: {
+                    #if os(macOS)
+                    return NSColor(red: 245/255, green: 142/255, blue: 39/255, alpha: 0.2)
+                    #else
+                    return UIColor(red: 245/255, green: 142/255, blue: 39/255, alpha: 0.2)
+                    #endif
+                }())
+            )
+
         ]
     }
 }
