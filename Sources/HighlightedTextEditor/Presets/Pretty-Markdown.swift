@@ -170,7 +170,7 @@ public extension Sequence where Iterator.Element == HighlightRule {
                     let paragraphStyle = NSMutableParagraphStyle()
                     paragraphStyle.firstLineHeadIndent = 15.0 // Adjust the value for indentation
                     paragraphStyle.headIndent = 23.0 // Adjust the value for indentation
-                    paragraphStyle.paragraphSpacing = 12.0 // Adjust the value for line spacing
+                    paragraphStyle.paragraphSpacing = 10.0 // Adjust the value for line spacing
                     return paragraphStyle
                 }())
             ),
@@ -181,7 +181,7 @@ public extension Sequence where Iterator.Element == HighlightRule {
                         let paragraphStyle = NSMutableParagraphStyle()
                         paragraphStyle.firstLineHeadIndent = 15.0 // Adjust the value for indentation
                         paragraphStyle.headIndent = 23.0 // Adjust the value for indentation
-                        paragraphStyle.paragraphSpacing = 12.0 // Adjust the value for line spacing
+                        paragraphStyle.paragraphSpacing = 10.0 // Adjust the value for line spacing
                         return paragraphStyle
                     }()),
                     TextFormattingRule(key: .foregroundColor, value: lighterColor) // Coloring the numbers
